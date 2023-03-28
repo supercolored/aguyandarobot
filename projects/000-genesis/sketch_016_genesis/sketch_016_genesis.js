@@ -103,7 +103,20 @@ function updateCircles() {
   for (let pitch in circlePositions) {
     let position = circlePositions[pitch];
     if (position.isFading) {
-      // ... (rest of the code remains the same)
+      let elapsed = millis() - position.fadeStartTime;
+      let fadeDuration = 1000; // 1 second
+
+      if (elapsed >= fadeDuration) {
+        // The circle has fully faded, remove it
+        delete circlePositions[pitch];
+      } else {
+        // Update the circle's opacity
+        let alpha = map(elapsed, 0, fadeDuration, 255, 0);
+        let fadedColor = color(red(position.color), green(position.color), blue(position.color), alpha);
+        fill(fadedColor);
+        noStroke();
+        ellipse(position.x, position.y, 50, 50);
+      }
     } else {
       // If the circle is not fading, draw it with the original color
       fill(position.color);
