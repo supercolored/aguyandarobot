@@ -2,6 +2,7 @@ let numKeys = 88;
 let lowestMidiNote = 21;
 let highestMidiNote = 108;
 let keyColors;
+let redrawBackground = true;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -29,8 +30,10 @@ function windowResized() {
 }
 
 function draw() {
-  background(240, 234, 214); // Eggshell color
-  noLoop();
+  if (redrawBackground) {
+    background(240, 234, 214); // Eggshell color
+    redrawBackground = false;
+  }
 }
 
 function onMIDISuccess(midiAccess) {
@@ -95,5 +98,7 @@ function clearVerticalBar(pitch) {
     noStroke();
     rect(x, 0, barWidth + 2 * padding, height);
     redraw();
+    redrawBackground = true;
   }
 }
+
