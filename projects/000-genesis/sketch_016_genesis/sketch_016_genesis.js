@@ -6,7 +6,9 @@ let angle = 0;
 let circlePositions = [];
 
 function setup() {
-  createCanvas(800, 600);
+  // createCanvas(800, 600);
+  createCanvas(windowWidth, windowHeight);
+
   keyColors = [
     color(255, 0, 0),      // Red
     color(255, 127, 0),    // Orange
@@ -23,6 +25,10 @@ function setup() {
   } else {
     console.log("Web MIDI API is not supported in your browser.");
   }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
 
 function draw() {
@@ -99,7 +105,7 @@ function drawCircle(pitch) {
 }
 
 function updateCircles() {
-  background(255); // Clear the canvas
+  background(240, 234, 214); // Eggshell color
   for (let pitch in circlePositions) {
     let position = circlePositions[pitch];
     if (position.isFading) {
@@ -129,7 +135,6 @@ function updateCircles() {
     }
   }
 }
-
 
 function hasFadingCircles() {
   for (let pitch in circlePositions) {
