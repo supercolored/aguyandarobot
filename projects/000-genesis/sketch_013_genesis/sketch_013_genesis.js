@@ -4,7 +4,8 @@ let highestMidiNote = 108;
 let keyColors;
 
 function setup() {
-  createCanvas(800, 600);
+  createCanvas(windowWidth, windowHeight);
+
   keyColors = [
     color(255, 0, 0),      // Red
     color(255, 127, 0),    // Orange
@@ -23,7 +24,12 @@ function setup() {
   }
 }
 
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
 function draw() {
+  background(240, 234, 214); // Eggshell color
   noLoop();
 }
 
