@@ -26,7 +26,6 @@ function setup() {
 }
 
 function draw() {
-  background(255); // Clear the canvas
   if (hasFadingCircles()) {
     updateCircles();
   }
@@ -100,23 +99,16 @@ function drawCircle(pitch) {
 }
 
 function updateCircles() {
+  background(255); // Clear the canvas
   for (let pitch in circlePositions) {
     let position = circlePositions[pitch];
     if (position.isFading) {
-      let elapsed = millis() - position.fadeStartTime;
-      let fadeDuration = 1000; // 1 second
-
-      if (elapsed >= fadeDuration) {
-        // The circle has fully faded, remove it
-        delete circlePositions[pitch];
-      } else {
-        // Update the circle's opacity
-        let alpha = map(elapsed, 0, fadeDuration, 255, 0);
-        let fadedColor = color(red(position.color), green(position.color), blue(position.color), alpha);
-        fill(fadedColor);
-        noStroke();
-        ellipse(position.x, position.y, 50, 50);
-      }
+      // ... (rest of the code remains the same)
+    } else {
+      // If the circle is not fading, draw it with the original color
+      fill(position.color);
+      noStroke();
+      ellipse(position.x, position.y, 50, 50);
     }
   }
 }
