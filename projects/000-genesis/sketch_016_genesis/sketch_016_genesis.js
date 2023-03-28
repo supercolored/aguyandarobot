@@ -113,9 +113,13 @@ function updateCircles() {
         // Update the circle's opacity
         let alpha = map(elapsed, 0, fadeDuration, 255, 0);
         let fadedColor = color(red(position.color), green(position.color), blue(position.color), alpha);
+
+        // Calculate the new radius
+        let newRadius = map(elapsed, 0, fadeDuration, 50, 10);
+
         fill(fadedColor);
         noStroke();
-        ellipse(position.x, position.y, 50, 50);
+        ellipse(position.x, position.y, newRadius, newRadius);
       }
     } else {
       // If the circle is not fading, draw it with the original color
@@ -125,6 +129,7 @@ function updateCircles() {
     }
   }
 }
+
 
 function hasFadingCircles() {
   for (let pitch in circlePositions) {
