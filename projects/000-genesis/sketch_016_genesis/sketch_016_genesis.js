@@ -26,7 +26,10 @@ function setup() {
 }
 
 function draw() {
-  noLoop();
+  background(255); // Clear the canvas
+  if (hasFadingCircles()) {
+    updateCircles();
+  }
 }
 
 function onMIDISuccess(midiAccess) {
@@ -62,10 +65,8 @@ function onMIDIMessage(message) {
 function clearCircle(pitch) {
   let position = circlePositions[pitch];
   if (position) {
-    fill(255);
-    noStroke();
-    ellipse(position.x, position.y, 50, 50);
-    redraw();
+    position.fadeStartTime = millis();
+    position.isFading = true;
   }
 }
 
@@ -88,11 +89,43 @@ function drawCircle(pitch) {
     angle += radians(10);
 
     // Save the circle's position
-    circlePositions[pitch] = { x: x, y: y, color: noteColor };
+    circlePositions[pitch] = { x: x, y: y, color: noteColor, isFading: false };
+
 
     fill(noteColor);
     noStroke();
     ellipse(x, y, 50, 50);
     redraw();
   }
+}
+
+function updateCircles() {
+  for (let pitch in circlePositions) {
+    let position = circlePositions[pitch];
+    if (position.isFading) {
+      let elapsed = millis() - position.fadeStartTime;
+      let fadeDuration = 1000; // 1 second
+
+      if (elapsed >= fadeDuration) {
+        // The circle has fully faded, remove it
+        delete circlePositions[pitch];
+      } else {
+        // Update the circle's opacity
+        let alpha = map(elapsed, 0, fadeDuration, 255, 0);
+        let fadedColor = color(red(position.color), green(position.color), blue(position.color), alpha);
+        fill(fadedColor);
+        noStroke();
+        ellipse(position.x, position.y, 50, 50);
+      }
+    }
+  }
+}
+
+function hasFadingCircles() {
+  for (let pitch in circlePositions) {
+    if (circlePositions[pitch].isFading) {
+      return true;
+    }
+  }
+  return false;
 }
