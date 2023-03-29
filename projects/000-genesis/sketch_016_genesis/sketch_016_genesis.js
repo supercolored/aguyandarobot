@@ -6,7 +6,6 @@ let angle = 0;
 let circlePositions = [];
 
 function setup() {
-  // createCanvas(800, 600);
   createCanvas(windowWidth, windowHeight);
 
   keyColors = [
@@ -18,6 +17,8 @@ function setup() {
     color(75, 0, 130),     // Indigo
     color(148, 0, 211)     // Violet
   ];
+  
+  background(240, 234, 214); // Eggshell color
 
   if (navigator.requestMIDIAccess) {
     navigator.requestMIDIAccess()
