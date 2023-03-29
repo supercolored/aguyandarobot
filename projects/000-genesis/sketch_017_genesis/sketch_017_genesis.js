@@ -4,6 +4,7 @@ let highestMidiNote = 108;
 let keyColors;
 let angle = 0;
 let circlePositions = [];
+let midiEvents = [];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -54,6 +55,10 @@ function onMIDIMessage(message) {
   let channel = message.data[0] & 0xf;
   let data1 = message.data[1];
   let data2 = message.data[2];
+
+  // Save the MIDI event
+  let timestamp = millis();
+  midiEvents.push({ command, channel, data1, data2, timestamp });
 
   // Note-on message
   if (command === 9 && data2 > 0) {
@@ -141,7 +146,6 @@ function updateCircles() {
   }
 }
 
-
 function hasFadingCircles() {
   for (let pitch in circlePositions) {
     if (circlePositions[pitch].isFading) {
@@ -149,4 +153,55 @@ function hasFadingCircles() {
     }
   }
   return false;
+}
+
+function exportMidiFile() {
+  // Create a new track
+  let track = new MidiWriter.Track();
+
+  // Set the tempo
+  let tempoBPM = 120; // Change this value to set a different tempo
+  track.setTempo(tempoBPM);
+  // let tempoEvent = new MidiWriter.TempoEvent({ tempo: tempoBPM });
+  // track.addEvent(tempoEvent);
+
+  // Add the MIDI events to the track
+  let previousTimestamp = 0;
+  for (let event of midiEvents) {
+    let deltaTime = event.timestamp - previousTimestamp;
+    let durationTicks = Math.round(deltaTime / (60000 / (tempoBPM * 128))); // Convert deltaTime to ticks
+
+    if (event.command === 9 && event.data2 > 0) {
+      let noteOn = new MidiWriter.NoteEvent({
+        pitch: [event.data1],
+        velocity: event.data2,
+        duration: 'T' + durationTicks
+      });
+      track.addEvent(noteOn);
+    } else if (event.command === 8 || (event.command === 9 && event.data2 === 0)) {
+      let noteOff = new MidiWriter.NoteEvent({
+        pitch: [event.data1],
+        velocity: event.data2,
+        duration: 'T' + durationTicks
+      });
+      track.addEvent(noteOff);
+    }
+
+    previousTimestamp = event.timestamp;
+  }
+
+  // Create a writer and add the track
+  let writer = new MidiWriter.Writer([track]);
+
+  // Save the MIDI file
+  let link = document.createElement('a');
+  link.href = writer.dataUri();
+  link.download = 'output.mid';
+  link.click();
+}
+
+function keyPressed() {
+  if (key === 's' || key === 'S') {
+    exportMidiFile();
+  }
 }
