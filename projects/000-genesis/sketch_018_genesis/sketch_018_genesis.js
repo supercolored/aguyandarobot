@@ -5,6 +5,7 @@ let keyColors;
 let angle = 0;
 let circlePositions = [];
 let midiEvents = [];
+let flockingCircles = [];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -37,6 +38,10 @@ function draw() {
   if (hasFadingCircles()) {
     updateCircles();
   }
+
+  if (flockingCircles.length > 0) {
+    updateFlockingCircles();
+  }
 }
 
 function onMIDISuccess(midiAccess) {
@@ -64,7 +69,7 @@ function onMIDIMessage(message) {
   if (command === 9 && data2 > 0) {
     console.log("Note:", data1);
     console.log("Velocity:", data2);
-    drawCircle(data1);
+    drawCircle(data1, data2);
   }
 
   // Note-off message or note-on with zero velocity
@@ -80,9 +85,11 @@ function clearCircle(pitch) {
     position.fadeStartTime = millis();
     position.isFading = true;
   }
+
+  flockingCircles = flockingCircles.filter(circle => circle.pitch !== pitch);
 }
 
-function drawCircle(pitch) {
+function drawCircle(pitch, velocity) {
   let index = pitch - lowestMidiNote;
   if (index >= 0 && index < numKeys) {
     let colorPos = map(index, 0, numKeys - 1, 0, keyColors.length - 1);
@@ -100,13 +107,25 @@ function drawCircle(pitch) {
     // Increment the angle for the next circle
     angle += radians(10);
 
-    // Save the circle's position
-    circlePositions[pitch] = { x: x, y: y, color: noteColor, isFading: false };
+    if (velocity > 45) {
+      let flockingCircle = {
+        pitch: pitch,
+        position: createVector(x, y),
+        velocity: createVector(random(-1, 1), random(-1, 1)),
+        acceleration: createVector(),
+        color: noteColor,
+        isFading: false
+      };
+      flockingCircles.push(flockingCircle);
+    } else {
+      // Save the circle's position
+      circlePositions[pitch] = { x: x, y: y, postion: createVector(x, y), color: noteColor, isFading: false };
+  
+      fill(noteColor);
+      noStroke();
+      ellipse(x, y, 50, 50);
+    }
 
-
-    fill(noteColor);
-    noStroke();
-    ellipse(x, y, 50, 50);
     redraw();
   }
 }
@@ -146,6 +165,105 @@ function updateCircles() {
     }
   }
 }
+
+function updateFlockingCircles() {
+  for (let circle of flockingCircles) {
+    // Calculate the forces for separation, alignment, and cohesion
+    let separation = separate(circle, circlePositions);
+    let alignment = align(circle, circlePositions);
+    let cohesion = cohere(circle, circlePositions);
+
+    // Assign weights to each force (you can adjust these values)
+    let separationWeight = 1.5;
+    let alignmentWeight = 1.0;
+    let cohesionWeight = 1.0;
+
+    // Apply the forces to the circle's acceleration
+    circle.acceleration.add(separation.mult(separationWeight));
+    circle.acceleration.add(alignment.mult(alignmentWeight));
+    circle.acceleration.add(cohesion.mult(cohesionWeight));
+
+    // Update the circle's position and velocity
+    circle.velocity.add(circle.acceleration);
+    circle.velocity.limit(4); // Limit the maximum speed (you can adjust this value)
+    circle.position.add(circle.velocity);
+
+    // Reset the acceleration for the next frame
+    circle.acceleration.mult(0);
+
+    // Draw the circle with its complimentary color
+    let compColor = color(255 - red(circle.color), 255 - green(circle.color), 255 - blue(circle.color));
+    fill(compColor);
+    noStroke();
+    ellipse(circle.position.x, circle.position.y, 50, 50);
+  }
+}
+
+function separate(circle, circles) {
+  let separation = createVector();
+  for (let otherCircle of circles) {
+    if (otherCircle !== circle) {
+      let dist = distance(circle.position, otherCircle.position);
+      if (dist < maxDistance) {
+        let diff = p5.Vector.sub(circle.position, otherCircle.position);
+        diff.normalize();
+        diff.div(dist);
+        separation.add(diff);
+      }
+    }
+  }
+  separation.div(circles.length - 1);
+  return separation;
+}
+
+function align(circle, circles) {
+  let alignment = createVector();
+  let count = 0;
+  for (let otherCircle of circles) {
+    if (otherCircle !== circle) {
+      let dist = distance(circle.position, otherCircle.position);
+      if (dist < maxDistance) {
+        alignment.add(otherCircle.velocity);
+        count++;
+      }
+    }
+  }
+  if (count > 0) {
+    alignment.div(count);
+    alignment.setMag(4);
+    alignment.sub(circle.velocity);
+    alignment.limit(1);
+  }
+  return alignment;
+}
+
+function cohere(circle, circles) {
+  let cohesion = createVector();
+  let count = 0;
+  for (let otherCircle of circles) {
+    if (otherCircle !== circle) {
+      let dist = distance(circle.position, otherCircle.position);
+      if (dist < maxDistance) {
+        cohesion.add(otherCircle.position);
+        count++;
+      }
+    }
+  }
+  if (count > 0) {
+    cohesion.div(count);
+    let desired = p5.Vector.sub(cohesion, circle.position);
+    desired.setMag(4);
+    let steer = p5.Vector.sub(desired, circle.velocity);
+    steer.limit(1);
+    return steer;
+  }
+  return cohesion;
+}
+
+function distance(a, b) {
+  return dist(a.x, a.y, b.x, b.y);
+}
+
 
 function hasFadingCircles() {
   for (let pitch in circlePositions) {
