@@ -103,7 +103,6 @@ function drawCircle(pitch) {
     // Save the circle's position
     circlePositions[pitch] = { x: x, y: y, color: noteColor, isFading: false };
 
-
     fill(noteColor);
     noStroke();
     ellipse(x, y, 50, 50);
