@@ -28,6 +28,7 @@ class CircularSpiralAnimation extends Animation {
     }
 
     onKeyPress(note, velocity, color) {
+      //console.log(note);
       this.drawCircle(note);
     }
 
@@ -72,7 +73,7 @@ class CircularSpiralAnimation extends Animation {
     }
   
     updateCircles() {
-      background(0); // Eggshell color
+      background(0);
       for (let pitch in this.circlePositions) {
         let position = this.circlePositions[pitch];
         if (position.isFading) {

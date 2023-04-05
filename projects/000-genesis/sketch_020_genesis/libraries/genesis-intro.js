@@ -10,7 +10,7 @@ let genesisText = "GENESIS";
 let initialSpacing = 20;
 let introElapsedTime = 0;
 let introLetterTimes = new Array(genesisText.length).fill(0).map((_, i) => i * 161);
-let introDuration = 10000;
+let introDuration = 15000;
 let introComplete = false;
 let introFadeSpeed = 300;
 let animationOptionsDelay = 1618; // Time in milliseconds
@@ -25,6 +25,7 @@ function introSetup() {
 
 function introUpdate() {
   background(0);
+  myFont && textFont(myFont);
   textAlign(CENTER, CENTER);
   textSize(20);
   noStroke();
@@ -42,7 +43,7 @@ function introUpdate() {
     }
     fill(255, opacity);
     let x = width / 2 - (genesisText.length * (letterSpacing + initialSpacing)) / 2 + i * (letterSpacing + initialSpacing);
-    text(genesisText[i], x, height / 2 - 50);
+    text(genesisText[i], x+20, height / 2 - 50);
   }
 
   introElapsedTime += deltaTime;
