@@ -2,12 +2,12 @@ let animation;
 let appState = "intro";
 
 let animations = [
-  { source: "vertical-bar.js", name: "Vertical Bars", class: VerticalBarAnimation },
-  { source: "circular-spiral.js", name: "Circular Spirals", class: CircularSpiralAnimation },
+  { source: "vertical-bar.js", name: "VERTICAL BARS", class: VerticalBarAnimation },
+  { source: "circular-spiral.js", name: "CIRCULAR SPIRALS", class: CircularSpiralAnimation },
 ];
 
 let genesisText = "GENESIS";
-let initialSpacing = 15;
+let initialSpacing = 20;
 let introElapsedTime = 0;
 let introLetterTimes = new Array(genesisText.length).fill(0).map((_, i) => i * 161);
 let introDuration = 10000;
@@ -26,7 +26,7 @@ function introSetup() {
 function introUpdate() {
   background(0);
   textAlign(CENTER, CENTER);
-  textSize(24); // Updated text size
+  textSize(20);
   noStroke();
 
   let progress = introElapsedTime / introDuration;
@@ -78,7 +78,7 @@ function showAnimationOptions() {
 
 function introDrawAnimationOptions() {
   textAlign(CENTER, CENTER);
-  textSize(24);
+  textSize(12);
   noStroke();
 
   animations.forEach((animation, index) => {
