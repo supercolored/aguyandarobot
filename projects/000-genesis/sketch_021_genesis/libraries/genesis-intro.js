@@ -2,8 +2,9 @@ let animation;
 let appState = "intro";
 
 let animations = [
-  { source: "vertical-bar.js", name: "VERTICAL BARS", class: VerticalBarAnimation },
-  { source: "circular-spiral.js", name: "CIRCULAR SPIRALS", class: CircularSpiralAnimation },
+  { source: "genesis-vertical-bar.js", name: "VERTICAL BARS", class: VerticalBarAnimation },
+  { source: "genesis-circular-spiral.js", name: "CIRCULAR SPIRALS", class: CircularSpiralAnimation },
+  { source: "genesis-diamond-emission.js", name: "DIAMOND EMISSION", class: DiamondEmissionAnimation },
 ];
 
 let genesisText = "GENESIS";

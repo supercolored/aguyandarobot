@@ -19,7 +19,8 @@ function setup() {
     color(148, 0, 211)     // Violet
   ];
   
-  background(240, 234, 214); // Eggshell color
+  //background(240, 234, 214); // Eggshell color
+  background(0); // Eggshell color
 
   if (navigator.requestMIDIAccess) {
     navigator.requestMIDIAccess()
@@ -111,7 +112,8 @@ function drawCircle(pitch) {
 }
 
 function updateCircles() {
-  background(240, 234, 214); // Eggshell color
+  //background(240, 234, 214); // Eggshell color
+  background(0);
   for (let pitch in circlePositions) {
     let position = circlePositions[pitch];
     if (position.isFading) {
